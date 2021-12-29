@@ -7,10 +7,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{FB527B57-B3E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthorizationServer", "src\AuthorizationServer\AuthorizationServer.csproj", "{EB6F3F82-73B1-42DC-B2EF-D1E6BF43FF87}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientMVCApp", "src\ClientMVCApp\ClientMVCApp.csproj", "{DA9E94FA-0418-496B-A590-B1FE1EFB79D7}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientWebApp", "src\ClientWebApp\ClientWebApp.csproj", "{D1EE89E6-834B-4ABC-AA5D-DDC8B43D35FE}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,18 +20,8 @@ Global
 		{EB6F3F82-73B1-42DC-B2EF-D1E6BF43FF87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB6F3F82-73B1-42DC-B2EF-D1E6BF43FF87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB6F3F82-73B1-42DC-B2EF-D1E6BF43FF87}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DA9E94FA-0418-496B-A590-B1FE1EFB79D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DA9E94FA-0418-496B-A590-B1FE1EFB79D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DA9E94FA-0418-496B-A590-B1FE1EFB79D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DA9E94FA-0418-496B-A590-B1FE1EFB79D7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D1EE89E6-834B-4ABC-AA5D-DDC8B43D35FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D1EE89E6-834B-4ABC-AA5D-DDC8B43D35FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D1EE89E6-834B-4ABC-AA5D-DDC8B43D35FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D1EE89E6-834B-4ABC-AA5D-DDC8B43D35FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{EB6F3F82-73B1-42DC-B2EF-D1E6BF43FF87} = {FB527B57-B3E7-4157-B441-AF5C634B10C6}
-		{DA9E94FA-0418-496B-A590-B1FE1EFB79D7} = {FB527B57-B3E7-4157-B441-AF5C634B10C6}
-		{D1EE89E6-834B-4ABC-AA5D-DDC8B43D35FE} = {FB527B57-B3E7-4157-B441-AF5C634B10C6}
 	EndGlobalSection
 EndGlobal
