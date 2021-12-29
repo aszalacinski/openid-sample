@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
@@ -104,11 +105,16 @@ public class AuthorizationController : Controller
             // 'subject' claim which is required
             new Claim(OpenIddictConstants.Claims.Subject, subject),
 
-            // access user application profile details here via a service call to set claims specific to the application
             
             // add some claim, don't forget to add destination as 'access_token' otherwise it won't be added to the access token.
             // subject above is required and is always added to access token
-            new Claim("some claim", "some value").SetDestinations(OpenIddictConstants.Destinations.AccessToken )
+            new Claim("some claim", "some value").SetDestinations(OpenIddictConstants.Destinations.AccessToken ),
+
+            // access user application profile details here via a service call to set user info claims specific to the application
+            // set the email claim for the user_info endpoint... wont' appear in the access token
+            new Claim(OpenIddictConstants.Claims.Email, "some.email@mailinator.com").SetDestinations(new List<string>{OpenIddictConstants.Destinations.AccessToken,OpenIddictConstants.Destinations.IdentityToken}),
+            // set the following token for user info endpoint only
+            new Claim(OpenIddictConstants.Claims.PhoneNumber, "111-111-1111").SetDestinations(OpenIddictConstants.Destinations.IdentityToken)
         };
 
         var claimsIdentity = new ClaimsIdentity(claims, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
@@ -127,5 +133,30 @@ public class AuthorizationController : Controller
 
         // signing in with the openiddict authentication scheme trigger OpenIddict to issue a code (which can be exchanged for an access token)
         return SignIn(claimsPrincipal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+    }
+
+    [Authorize(AuthenticationSchemes = OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)]
+    [HttpGet("~/connect/userinfo")]
+    public async Task<IActionResult> Userinfo()
+    {
+        var claimsPrincipal = (await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)).Principal;
+
+        if (claimsPrincipal is not null)
+        {
+            // get claims from claims principal OR
+            // access user application profile details here via a service call to set user info claims specific to the application
+
+            return Ok(new
+            {
+                Name = claimsPrincipal.GetClaim(OpenIddictConstants.Claims.Subject),
+                Email = claimsPrincipal.GetClaim(OpenIddictConstants.Claims.Email),
+                Company = "Happy App Software",
+                Occupation = "Developer",
+            });
+        }
+        else
+        {
+            return new EmptyResult();
+        }
     }
 }
