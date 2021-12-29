@@ -8,13 +8,13 @@
         {
             var authenticationResult = await Context.AuthenticateAsync();
 
-            string? issued = string.Empty;
-            string? expires = string.Empty;
+            string issued = string.Empty;
+            string expires = string.Empty;
 
             if (authenticationResult is not null && authenticationResult.Properties is not null)
             {
-                issued = authenticationResult.Properties.Items[".issued"];
-                expires = authenticationResult.Properties.Items[".expires"];
+                issued = authenticationResult.Properties.Items[".issued"] ?? "not set";
+                expires = authenticationResult.Properties.Items[".expires"] ?? "not set";
             }
             <div>
                 <p>You are signed in as</p>

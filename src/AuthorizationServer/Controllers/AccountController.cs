@@ -36,6 +36,7 @@ public class AccountController : Controller
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
+            // this sets the Auth cookie on sign in and allows the auth server to know if the user is authenticated or not
             await HttpContext.SignInAsync(new ClaimsPrincipal(claimsIdentity));
 
             if (Url.IsLocalUrl(model.ReturnUrl))
