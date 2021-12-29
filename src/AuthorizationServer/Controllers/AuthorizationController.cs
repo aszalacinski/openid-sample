@@ -1,6 +1,8 @@
 
 using System.Security.Claims;
 using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
@@ -9,15 +11,16 @@ namespace AuthorizationServer.Controllers;
 
 public class AuthorizationController : Controller
 {
-    [HttpPost("~/connect/token")]
-    public IActionResult Exchange()
+    // token endpoint
+    [HttpPost("~/connect/token"), Produces("application/json")]
+    public async Task<IActionResult> Exchange()
     {
         var request = HttpContext.GetOpenIddictServerRequest() ?? throw new InvalidOperationException("The OpenId Connect request cannot be retrieved.");
 
         // this is NOT the same as the one used in the Account Login endpoint
         // THAT one is based on Cooke Authentication handler and is ONLY used within the context of the Auth server itself to
         // determin if the user has been authenticated or not.
-        ClaimsPrincipal claimsPrincipal;
+        ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal();
 
         if (request.IsClientCredentialsGrantType())
         {
@@ -41,12 +44,88 @@ public class AuthorizationController : Controller
             // the reason we add the scopes manually here is that we are able to filter the scopes granted here if we want to
             claimsPrincipal.SetScopes(request.GetScopes());
         }
+        else if (request.IsAuthorizationCodeGrantType())
+        {
+            // retrieve the claims principal stored in the authorization code
+
+            var retrievedPrincipal = (await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)).Principal;
+
+            if (retrievedPrincipal is not null)
+            {
+                claimsPrincipal = retrievedPrincipal;
+            }
+        }
         else
         {
             throw new InvalidOperationException("The specified grant type is not supported.");
         }
 
         // returning a signinresult will ask openiddict to issue the appropriate access/identity tokens
+        return SignIn(claimsPrincipal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+    }
+
+    // auth endpoint
+    [HttpGet("~/connect/authorize")]
+    [HttpPost("~/connect/authorize")]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> Authorize()
+    {
+        var request = HttpContext.GetOpenIddictServerRequest() ??
+            throw new InvalidOperationException("The OpenId connect request cannot be retrieved");
+
+        // retrieve the user principal stored in the authentication cookie.
+        var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+        // if the user principal can't be extracted, redirect the user to the login page
+        // cookie wasn't there or is stale
+        // redirect user back to login and note that it will redirect to authorize on successful login
+        if (!result.Succeeded)
+        {
+            return Challenge(
+                authenticationSchemes: CookieAuthenticationDefaults.AuthenticationScheme,
+                properties: new AuthenticationProperties
+                {
+                    RedirectUri = Request.PathBase + Request.Path + QueryString.Create(
+                        Request.HasFormContentType ? Request.Form.ToList() : Request.Query.ToList()
+                    )
+                }
+            );
+        }
+
+        string subject = string.Empty;
+
+        if (result.Principal is not null && result.Principal.Identity is not null)
+        {
+            subject = result.Principal.Identity.Name ?? string.Empty;
+        }
+
+        // create a new claims principal
+        var claims = new List<Claim> {
+            // 'subject' claim which is required
+            new Claim(OpenIddictConstants.Claims.Subject, subject),
+
+            // access user application profile details here via a service call to set claims specific to the application
+            
+            // add some claim, don't forget to add destination as 'access_token' otherwise it won't be added to the access token.
+            // subject above is required and is always added to access token
+            new Claim("some claim", "some value").SetDestinations(OpenIddictConstants.Destinations.AccessToken )
+        };
+
+        var claimsIdentity = new ClaimsIdentity(claims, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+
+        // this is NOT the same as the one used in the Account Login endpoint
+        // THAT one is based on Cooke Authentication handler and is ONLY used within the context of the Auth server itself to
+        // determin if the user has been authenticated or not.
+        var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+        // set the requested scopes (this is not done automatically)
+        // grant all requested scopes here
+        // OpenIddict has already checked if the requested scopes are allowed (as a whole and for the current client)
+        // the reason we add the scopes manually here is that we are able to filter the scopes granted here if we want to
+        // note... a consent screen selected options would be where we would filter out scopes
+        claimsPrincipal.SetScopes(request.GetScopes());
+
+        // signing in with the openiddict authentication scheme trigger OpenIddict to issue a code (which can be exchanged for an access token)
         return SignIn(claimsPrincipal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
 }

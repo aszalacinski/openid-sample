@@ -35,11 +35,20 @@ builder.Services.AddOpenIddict()
     // Register the OpenIddict server components
     .AddServer(options =>
     {
+        // authorization code flow with PKCE extension
+        // client apps that need a user to login to use them, i.e. SPA or mobile apps
+        options
+            .AllowAuthorizationCodeFlow()
+            // require PKCE
+            .RequireProofKeyForCodeExchange();
+
         // machine to machine communication
         // looking for a client_id and a client_secret
         options.AllowClientCredentialsFlow();
 
-        options.SetTokenEndpointUris("/connect/token");
+        options
+            .SetAuthorizationEndpointUris("/connect/authorize")
+            .SetTokenEndpointUris("/connect/token");
 
         // Encryption and signing of tokens
         // this is development configuration
@@ -57,7 +66,8 @@ builder.Services.AddOpenIddict()
         // Register the ASP.NET Core host and configure the ASP.NET Core specific options.
         options
             .UseAspNetCore()
-            .EnableTokenEndpointPassthrough();
+            .EnableTokenEndpointPassthrough()
+            .EnableAuthorizationEndpointPassthrough();
     });
 
 builder.Services.AddHostedService<TestData>();

@@ -29,6 +29,7 @@ public class AccountController : Controller
         if (ModelState.IsValid)
         {
             // validate username and password here
+            // this is probably where ASPNET Identity gets implemented
 
             var claims = new List<Claim> {
                 new Claim(ClaimTypes.Name, model.Username)

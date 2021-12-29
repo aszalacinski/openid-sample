@@ -26,12 +26,23 @@ public class TestData : IHostedService
             await manager.CreateAsync(new OpenIddictApplicationDescriptor
             {
                 ClientId = "postman",
+                // client secret is optional when configuring clients; 
+                // it's optional as clients that are public (such as SPA) cannot securely store the secret
+                // when omitted from the configuration, it can be omitted from the request
+                // server side apps typically should use them
                 ClientSecret = "postman-secret",
                 DisplayName = "Postman",
+                RedirectUris = { new Uri("https://oauth.pstmn.io/v1/callback") },
                 Permissions =  {
+                    OpenIddictConstants.Permissions.Endpoints.Authorization,
                     OpenIddictConstants.Permissions.Endpoints.Token,
+
+                    OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
                     OpenIddictConstants.Permissions.GrantTypes.ClientCredentials,
-                    OpenIddictConstants.Permissions.Prefixes.Scope + "api"
+
+                    OpenIddictConstants.Permissions.Prefixes.Scope + "api",
+
+                    OpenIddictConstants.Permissions.ResponseTypes.Code
                 }
             }, cancellationToken);
         }
