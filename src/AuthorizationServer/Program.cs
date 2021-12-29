@@ -39,12 +39,15 @@ builder.Services.AddOpenIddict()
         // client apps that need a user to login to use them, i.e. SPA or mobile apps
         options
             .AllowAuthorizationCodeFlow()
-            // require PKCE
-            .RequireProofKeyForCodeExchange();
-
-        // machine to machine communication
-        // looking for a client_id and a client_secret
-        options.AllowClientCredentialsFlow();
+                // require PKCE
+                .RequireProofKeyForCodeExchange()
+            // machine to machine communication
+            // looking for a client_id and a client_secret
+            .AllowClientCredentialsFlow()
+            // allow refresh tokens
+            // request needs to ask for the 'offline_access' scope to include a refresh token
+            // subsequent calls by the client to the token endpoint can use the refresh token instead of the access token
+            .AllowRefreshTokenFlow();
 
         options
             .SetAuthorizationEndpointUris("/connect/authorize")

@@ -56,6 +56,16 @@ public class AuthorizationController : Controller
                 claimsPrincipal = retrievedPrincipal;
             }
         }
+        else if (request.IsRefreshTokenGrantType())
+        {
+            // Retrieve the claims principal stored in the refresh token.
+            var retrievedPrincipal = (await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)).Principal;
+
+            if (retrievedPrincipal is not null)
+            {
+                claimsPrincipal = retrievedPrincipal;
+            }
+        }
         else
         {
             throw new InvalidOperationException("The specified grant type is not supported.");
