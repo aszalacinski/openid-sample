@@ -1,20 +1,16 @@
 {
     "version": "0.2.0",
     "configurations": [
+        // auth server launch configs
         {
-            // Use IntelliSense to find out which attributes exist for C# debugging
-            // Use hover for the description of the existing attributes
-            // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
-            "name": ".NET Core Launch (web)",
+            "name": "Authorization Server Web",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
-            // If you have changed target frameworks, make sure to update the program path.
+            "preLaunchTask": "build:AuthorizationServer",
             "program": "${workspaceFolder}/src/AuthorizationServer/bin/Debug/net6.0/AuthorizationServer.dll",
             "args": [],
             "cwd": "${workspaceFolder}/src/AuthorizationServer",
             "stopAtEntry": false,
-            // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
             "serverReadyAction": {
                 "action": "openExternally",
                 "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
@@ -27,9 +23,28 @@
             }
         },
         {
+            "name": "Authorization Server Docker",
+            "type": "docker",
+            "request": "launch",
+            "preLaunchTask": "docker-run:debug:AuthorizationServer",
+            "netCore": {
+                "appProject": "${workspaceFolder}/src/AuthorizationServer/AuthorizationServer.csproj"
+            }
+        },
+        {
             "name": ".NET Core Attach",
             "type": "coreclr",
             "request": "attach"
+        },
+        // https://code.visualstudio.com/docs/containers/docker-compose#_debug
+        {
+            "name": "Docker Compose Debug - Authorization Server",
+            "type": "docker",
+            "request": "attach",
+            "platform": "netCore",
+            "sourceFileMap": {
+                "/src": "${workspaceFolder}"
+            }
         }
     ]
 }
