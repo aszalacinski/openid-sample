@@ -1,0 +1,16 @@
+{
+    "tslint.configFile": "./tslint.json",
+    "prettier.singleQuote": true,
+    "prettier.trailingComma": "es5",
+    "prettier.printWidth": 140,
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": true,
+      "source.organizeImports": true
+    },
+    "editor.formatOnPaste": false,
+    "editor.codeActionsOnSaveTimeout": 750,
+    "editor.formatOnSaveTimeout": 750,
+    "docthis.includeDateTag": true,
+    "files.exclude": {}
+  }
